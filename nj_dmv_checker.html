@@ -32,32 +32,28 @@ var app = new Vue({
     methods: {
     loadData: function () {
       for (i = 0; i < this.locations.length; i++ ) {
-        var today = new Date();
-        var dd = String(today.getDate()).padStart(2, '0');
-        var mm = String(today.getMonth() + 1).padStart(2, '0');
-        var yyyy = today.getFullYear();
-        var urlBase = "https://telegov.njportal.com/njmvc/CustomerCreateAppointments/GetAvailableDatesForMonth?duration=30";
-        var dateString = '&date=' +yyyy + '-' + mm + '-' + dd + 'T05:00:00.000Z';
-        var locationString = "&locationId=" + this.locations[i].id;
-        var appointmentString = "&appointmentId=11";
-        var url = urlBase + locationString + appointmentString + dateString
+        var url = "https://us-central1-james-lewis-personal.cloudfunctions.net/nj_dmv_checker?id=" + this.locations[i].id + "&idx=" + i;
         console.log(url);
-        // $.get(url, function (response) {
-        //     if (response == "[]") {
-        //         console.log("NULL RESPONSE FOR " + this.locations[i].id)
-        //     }
-        // }.bind(this));
-        $.ajax({
-            type: 'GET',
-            url: url,
-            crossDomain: true,
-            success: function(responseData, textStatus, jqXHR) {
-                alert("GEt succeseds")
-            },
-            error: function (responseData, textStatus, errorThrown) {
-                alert('GET failed.');
+        $.get(url, function (response) {
+            if (response['resp'].length > 0) {
+                this.locations[response['idx']].available = "Maybe";
+                alert("Possible availability at " + this.locations[response['idx']].name)
             }
-        });
+            else {
+                this.locations[response['idx']].available = "None";
+            }
+        }.bind(this));
+        // $.ajax({
+        //     type: 'GET',
+        //     url: url,
+        //     crossDomain: true,
+        //     success: function(responseData, textStatus, jqXHR) {
+        //         alert("GEt succeseds")
+        //     },
+        //     error: function (responseData, textStatus, errorThrown) {
+        //         alert('GET failed.');
+        //     }
+        // });
       }
     }
     },

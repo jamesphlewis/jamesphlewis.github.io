@@ -1,5 +1,4 @@
 index.js
-
 /**
  * Required Modules
  */
@@ -14,6 +13,7 @@ const axios = require("axios");
  */
 exports.njDmvChecker = async(req, res) => {
   let locationId = req.query.id;
+  let idxId = req.query.idx;
   var today = new Date();
   var dd = String(today.getDate()).padStart(2, '0');
   var mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -24,19 +24,21 @@ exports.njDmvChecker = async(req, res) => {
   var appointmentString = "&appointmentId=11";
   var url = urlBase + locationString + appointmentString + dateString;
   // Invoke API.
-  console.log("Fetching " + url)
-  var responsePayload = ""
+  console.log("Fetching " + url);
+  res.set('Access-Control-Allow-Origin', '*');
+  var responsePayload = "";
   axios.get(url)
   .then(function (response) {
-    responsePayload = response.data
+    responsePayload = response.data;
   })
   .catch(function (error) {
-    responsePayload = "[XXX]"
+    responsePayload = [];
   })
   .then(function () {
-    res.status(200).send(responsePayload)
+    res.status(200).send({idx: idxId, id: locationId, resp: responsePayload})
   });
 };
+
 
 
 package.json
