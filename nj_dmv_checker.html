@@ -1,0 +1,72 @@
+<html>
+    <title>NJ DMV Checker</title>
+    <div id="app">
+        <ul id="locations_list">
+            <li v-for="item in locations">
+                <a :href="'https://telegov.njportal.com/njmvc/AppointmentWizard/11/' +  item.id ">{{ item.name }} - {{ item.available }}</a>
+            </li>
+        </ul>
+    </div>
+</html>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+var app = new Vue({
+    el: '#app',
+    data: {
+      
+      locations: [
+        {id: 119, name: "Oakland", available: "None"},
+        {id: 123, name: "Randolph", available: "None"},
+        {id: 118, name: "Wayne", available: "None"},
+        {id: 120, name: "Patterson", available: "None"},
+        {id: 114, name: "Lodi"},
+        {id: 117, name: "North Bergen", available: "None"},
+        {id: 116, name: "Newark", available: "None"},
+        {id: 102, name: "Bayonne", available: "None"}
+      ]
+    },
+    methods: {
+    loadData: function () {
+      for (i = 0; i < this.locations.length; i++ ) {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        var urlBase = "https://telegov.njportal.com/njmvc/CustomerCreateAppointments/GetAvailableDatesForMonth?duration=30";
+        var dateString = '&date=' +yyyy + '-' + mm + '-' + dd + 'T05:00:00.000Z';
+        var locationString = "&locationId=" + this.locations[i].id;
+        var appointmentString = "&appointmentId=11";
+        var url = urlBase + locationString + appointmentString + dateString
+        console.log(url);
+        // $.get(url, function (response) {
+        //     if (response == "[]") {
+        //         console.log("NULL RESPONSE FOR " + this.locations[i].id)
+        //     }
+        // }.bind(this));
+        $.ajax({
+            type: 'GET',
+            url: url,
+            crossDomain: true,
+            success: function(responseData, textStatus, jqXHR) {
+                alert("GEt succeseds")
+            },
+            error: function (responseData, textStatus, errorThrown) {
+                alert('GET failed.');
+            }
+        });
+      }
+    }
+    },
+    mounted: function () {
+        this.loadData();
+
+        setInterval(function () {
+        this.loadData();
+        }.bind(this), 300000); 
+    }
+});
+</script>
